@@ -1,0 +1,11 @@
+# Uploaded files
+assets/uploads/*
+!assets/uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

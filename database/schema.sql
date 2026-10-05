@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS lostfound CHARACTER SET utf8mb4;
+USE lostfound;
+CREATE TABLE users(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(100),email VARCHAR(120) UNIQUE,phone VARCHAR(15),password_hash VARCHAR(255),role ENUM('student','faculty','staff','admin') DEFAULT 'student',status ENUM('active','blocked') DEFAULT 'active',created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE categories(id INT AUTO_INCREMENT PRIMARY KEY,name VARCHAR(50));
+INSERT INTO categories(name) VALUES('Phone'),('Wallet'),('ID Card'),('Books'),('Keys'),('Bags'),('Other');
+CREATE TABLE items(id INT AUTO_INCREMENT PRIMARY KEY,user_id INT,type ENUM('lost','found'),name VARCHAR(120),category VARCHAR(50),description TEXT,image_path VARCHAR(255),date_event DATE,location_text VARCHAR(200),lat DOUBLE NULL,lng DOUBLE NULL,status ENUM('lost','found','claimed','returned'),created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,INDEX(status,category,date_event));
+CREATE TABLE claims(id INT AUTO_INCREMENT PRIMARY KEY,item_id INT,claimant_id INT,proof_description TEXT,status ENUM('pending','approved','rejected') DEFAULT 'pending',created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(item_id) REFERENCES items(id) ON DELETE CASCADE,FOREIGN KEY(claimant_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE messages(id INT AUTO_INCREMENT PRIMARY KEY,claim_id INT,sender_id INT,body TEXT,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(claim_id) REFERENCES claims(id) ON DELETE CASCADE);
+CREATE TABLE notifications(id INT AUTO_INCREMENT PRIMARY KEY,user_id INT,message VARCHAR(255),link VARCHAR(255),is_read TINYINT DEFAULT 0,created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);
+CREATE TABLE handovers(id INT AUTO_INCREMENT PRIMARY KEY,claim_id INT,qr_token VARCHAR(64),verified_by INT NULL,verified_at DATETIME NULL,status ENUM('pending','verified') DEFAULT 'pending',FOREIGN KEY(claim_id) REFERENCES claims(id) ON DELETE CASCADE);
